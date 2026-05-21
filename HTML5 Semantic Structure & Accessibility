@@ -1,0 +1,162 @@
+<!-- ===================== index.html ===================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal portfolio showcasing projects, skills, and contact information.">
+  <meta name="keywords" content="portfolio, web developer, projects, HTML5, accessibility">
+  <meta name="author" content="Your Name">
+  <title>Home | Portfolio</title>
+</head>
+<body>
+  <header role="banner">
+    <h1>My Portfolio</h1>
+    <nav role="navigation" aria-label="Main Navigation">
+      <ul>
+        <li><a href="index.html" aria-current="page">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main role="main">
+    <section>
+      <h2>Welcome</h2>
+      <p>This is my accessible HTML5 portfolio website.</p>
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <p>&copy; 2026 Your Name</p>
+  </footer>
+</body>
+</html>
+
+
+<!-- ===================== about.html ===================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="About me section of portfolio.">
+  <title>About | Portfolio</title>
+</head>
+<body>
+  <header>
+    <h1>About Me</h1>
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html" aria-current="page">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <article>
+      <h2>Who I Am</h2>
+      <p>I am a B.Tech student with skills in Python, C, and OOP.</p>
+    </article>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Your Name</p>
+  </footer>
+</body>
+</html>
+
+
+<!-- ===================== projects.html ===================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Projects portfolio.">
+  <title>Projects | Portfolio</title>
+</head>
+<body>
+  <header>
+    <h1>Projects</h1>
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="projects.html" aria-current="page">Projects</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>My Work</h2>
+      <article>
+        <h3>Project 1</h3>
+        <p>Description of project.</p>
+      </article>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Your Name</p>
+  </footer>
+</body>
+</html>
+
+
+<!-- ===================== contact.html ===================== -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Contact form page.">
+  <title>Contact | Portfolio</title>
+</head>
+<body>
+  <header>
+    <h1>Contact</h1>
+    <nav aria-label="Main Navigation">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="contact.html" aria-current="page">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Get in Touch</h2>
+      <form action="#" method="post">
+        <fieldset>
+          <legend>Contact Form</legend>
+
+          <label for="name">Name:</label>
+          <input type="text" id="name" name="name" required aria-required="true">
+
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required aria-required="true">
+
+          <label for="message">Message:</label>
+          <textarea id="message" name="message" required aria-required="true"></textarea>
+
+          <button type="submit">Send</button>
+        </fieldset>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2026 Your Name</p>
+  </footer>
+</body>
+</html>
