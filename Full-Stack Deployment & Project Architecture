@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURORA — Premium Accessible Catalog Hub</title>
+    <style>
+        :root {
+            /* WCAG AA Compliant High-Contrast Color Palette */
+            --bg: #0b0f19;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #cbd5e1; /* Increased contrast for readability */
+            --primary: #38bdf8;
+            --border: #475569;
+            --radius: 12px;
+            --focus-ring: #f59e0b; /* Clear gold color for keyboard focus indicators */
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        /* Skip to Content Link for Keyboard Users */
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            background: var(--primary);
+            color: #0b0f19;
+            padding: 12px;
+            z-index: 200;
+            font-weight: 700;
+            transition: top 0.2s;
+        }
+        .skip-link:focus {
+            top: 0;
+            outline: 3px solid var(--focus-ring);
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        
+        /* Persistent Structural Elements */
+        nav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; height: 70px; }
+        
+        /* Semantic Interactive Elements replacing broken 'onclick' divs */
+        .logo { font-size: 22px; font-weight: 800; letter-spacing: -0.05em; color: var(--primary); background: none; border: none; cursor: pointer; padding: 8px 0; }
+        .nav-links { display: flex; gap: 16px; list-style: none; margin: 0; padding: 0; }
+        .nav-btn { background: none; border: none; color: var(--text); font-weight: 600; font-size: 16px; cursor: pointer; padding: 8px 12px; border-radius: 6px; }
+        .nav-btn:hover { color: var(--primary); }
+        .cart-badge { background: var(--primary); color: #0b0f19; padding: 2px 8px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-left: 4px; }
+        
+        /* Strict Focus Ring Indicators */
+        button:focus-visible, a:focus-visible {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+        }
+        
+        main { padding: 40px 0; }
+        main:focus { outline: none; }
+        
+        /* Grid Layout Blueprint */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 32px; list-style: none; padding: 0; margin: 0; }
+        .product-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+        .img-wrap { width: 100%; height: 300px; background: #141b2b; overflow: hidden; }
+        .img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .card-body { padding: 24px; display: flex; flex-direction: column; flex-grow: 1; }
+        .card-body h3 { margin: 0 0 12px 0; font-size: 18px; line-height: 1.4; }
+        .card-title-btn { background: none; border: none; color: #fff; text-align: left; font-size: inherit; font-weight: inherit; font-family: inherit; cursor: pointer; padding: 0; width: 100%; }
+        .card-title-btn:hover { color: var(--primary); text-decoration: underline; }
+        .price { font-weight: 700; font-size: 20px; color: var(--primary); margin: 0 0 16px 0; }
+        .card-body .btn { margin-top: auto; }
+        
+        /* Interactive Buttons */
+        .btn { background: var(--primary); color: #0b0f19; border: none; padding: 14px 28px; border-radius: var(--radius); font-weight: 700; font-size: 16px; cursor: pointer; display: inline-block; text-align: center; }
+        .btn:hover { opacity: 0.9; }
+        .btn-danger { background: #ef4444; color: white; padding: 8px 16px; font-size: 14px; }
+        
+        /* Dynamic Inner Canvas Modules */
+        .detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+        @media(max-width: 768px) { .detail-layout { grid-template-columns: 1fr; gap: 24px; } }
+        .cart-list { list-style: none; padding: 0; margin: 0; }
+        .cart-row { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--border); }
+        
+        /* Visually Hidden Helper (Screen Readers Only) */
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Accessibility Rule 1: Skip Navigation Link -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Accessibility Rule 2: Semantic Structural Containers (<nav>, <main>) -->
+    <div id="nav-shell"></div>
+    <main class="container" id="main-content" tabindex="-1"></main>
+
+    <!-- Accessibility Rule 3: ARIA Live Region for Status Updates -->
+    <div id="app-status" class="sr-only" aria-live="polytic"></div>
+
+    <script>
+        // --- 1. STATE LAKE MANAGEMENT SYSTEM ---
+        const store = {
+            state: {
+                products: [
+                    { id: "1", name: "Minimalist Leather Backpack", price: 145, desc: "Premium full-grain leather companion designed for maximum daily utility.", img: "https://unsplash.com" },
+                    { id: "2", name: "Anodized Aluminum Pen", price: 38, desc: "Precision CNC-machined drafting instrument crafted from structural alloy.", img: "https://unsplash.com" },
+                    { id: "3", name: "Monolithic Wireless Charger", price: 62, desc: "Solid American walnut block embedding certified high-efficiency wireless charging nodes.", img: "https://unsplash.com" },
+                    { id: "4", name: "Merino Wool Knit Beanie", price: 45, desc: "Ethically sourced temperature regulation weave designed for thermal comfort.", img: "https://unsplash.com" }
+                ],
+                cart: JSON.parse(localStorage.getItem("app_cart")) || [],
+                currentPage: 'home',         
+                selectedProductId: null
+            },
+            listeners: [],
+            subscribe(callback) {
+                this.listeners.push(callback);
+            },
+            dispatch(action, payload) {
+                let statusText = "";
+                if (action === "ADD_TO_CART") {
+                    const match = this.state.cart.find(item => item.id === payload.id);
+                    if (match) match.qty += 1;
+                    else this.state.cart.push({ id: payload.id, qty: 1 });
+                    
+                    const pName = this.state.products.find(p => p.id === payload.id).name;
+                    statusText = `${pName} added to shopping cart.`;
+                }
+                if (action === "REMOVE_ITEM") {
+                    const pName = this.state.products.find(p => p.id === payload).name;
+                    this.state.cart = this.state.cart.filter(item => item.id !== payload);
+                    statusText = `${pName} removed from shopping cart.`;
+                }
+                if (action === "NAVIGATE") {
+                    this.state.currentPage = payload.page;
+                    this.state.selectedProductId = payload.id || null;
+                }
+                localStorage.setItem("app_cart", JSON.stringify(this.state.cart));
+                
+                // Announce actions to screen readers via ARIA live container
+                if(statusText) document.getElementById('app-status').textContent = statusText;
+                
+                this.listeners.forEach(cb => cb({ ...this.state }));
+            }
+        };
+
+        // --- 2. SEMANTIC VIEW ENGINE PARTS ---
+        function NavbarComponent(state) {
+            const totalItems = state.cart.reduce((acc, item) => acc + item.qty, 0);
+            return `
+                <nav aria-label="Main Navigation">
+                    <div class="container nav-container">
+                        <button class="logo" onclick="store.dispatch('NAVIGATE', {page: 'home'})" aria-label="AURORA Home">AURORA.</button>
+                        <ul class="nav-links">
+                            <li><button class="nav-btn" onclick="store.dispatch('NAVIGATE', {page: 'home'})">Home</button></li>
+                            <li><button class="nav-btn" onclick="store.dispatch('NAVIGATE', {page: 'catalog'})">Catalog</button></li>
+                            <li>
+                                <button class="nav-btn" onclick="store.dispatch('NAVIGATE', {page: 'cart'})" aria-label="Shopping Cart, ${totalItems} items">
+                                    Cart <span class="cart-badge" aria-hidden="true">${totalItems}</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            `;
+        }
+
+        function ProductCardComponent(product) {
+            return `
+                <li>
+                    <article class="product-card">
+                        <div class="img-wrap">
+                            <!-- Accessibility Rule 4: Explicit alt descriptions -->
+                            <img src="${product.img}" alt="Product photograph of ${product.name}" loading="lazy">
+                        </div>
+                        <div class="card-body">
+                            <h3>
+                                <button class="card-title-btn" onclick="store.dispatch('NAVIGATE', {page: 'detail', id: '${product.id}'})">
+                                    ${product.name}
+                                </button>
+                            </h3>
+                            <p class="price"><span class="sr-only">Price: </span>$${product.price}.00</p>
+                            <button class="btn" onclick="store.dispatch('ADD_TO_CART', {id: '${product.id}'})" aria-label="Add ${product.name} to cart">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </article>
+                </li>
+            `;
+        }
+
+        const Pages = {
+            home() {
+                return `
+                    <section style="text-align: center; padding: 80px 0;">
+                        <h1 style="font-size: 54px; margin-bottom: 20px; letter-spacing: -0.03em;">Engineered Minimalism.</h1>
+                        <p style="color: var(--text-muted); max-width: 620px; margin: 0 auto 40px auto; font-size: 18px; line-height: 1.7;">
+                            An optimized curation of daily essential hard-goods focused around spatial economy and structural longevity.
+                        </p>
+                        <button class="btn" onclick="store.dispatch('NAVIGATE', {page: 'catalog'})">Explore Collection</button>
+                    </section>
+                `;
+            },
+            catalog(state) {
+                const cards = state.products.map(p => ProductCardComponent(p)).join('');
+                return `
+                    <section aria-label="Product Catalog">
+                        <h1 style="margin-bottom: 36px; font-size: 32px; letter-spacing: -0.02em;">Catalog Collection</h1>
+                        <ul class="grid">${cards}</ul>
+                    </section>
+                `;
+            },
+            detail(state) {
+                const product = state.products.find(p => p.id === state.selectedProductId);
+                if (!product) return `<div style="text-align:center;"><h2>Specification Not Found</h2></div>`;
+                return `
+                    <section class="detail-layout" aria-label="${product.name} Detail Specification View">
+                        <div class="img-wrap" style="height: 480px; border-radius: var(--radius); border: 1px solid var(--border);">
+                            <img src="${product.img}" alt="Detailed photograph of ${product.name}">
+                        </div>
+                        <div>
+                            <h1 style="font-size: 38px; margin: 0 0 12px 0; letter-spacing: -0.02em;">${product.name}</h1>
+                            <p class="price"><span class="sr-only">Price: </span>$${product.price}.00</p>
+                            <p style="color: var(--text-muted); margin-bottom: 40px; font-size: 16px; line-height: 1.7;">${product.desc}</p>
+                            <button class="btn" onclick="store.dispatch('ADD_TO_CART', {id: '${product.id}'})">Add To Cart</button>
+                        </div>
+                    </section>
+                `;
+            },
+            cart(state) {
+                if (state.cart.length === 0) {
+                    return `
+                        <div style="text-align: center; padding: 60px 0;">
+                          <h1 style="font-size: 28px; margin-bottom: 12px;">Your shopping cart is empty</h1>
+                          <button class="btn" onclick="store.dispatch('NAVIGATE', {page: 'catalog'})">Browse Catalog Collection</button>
+                        </div>
+                    `;
+                }
+                const total = state.cart.reduce((acc, item) => {
+                    const originalProduct = state.products.find(p => p.id === item.id);
+                    return acc + (originalProduct.price * item.qty);
+                }, 0);
+
+                const rows = state.cart.map(item => {
+                    const original = state.products.find(p => p.id === item.id);
+                    return `
+                        <li class="cart-row">
+                            <div>
+                                <h2 style="margin: 0 0 6px 0; font-size: 18px;">${original.name}</h2>
+                                <p style="color: var(--text-muted); margin: 0;">Quantity: ${item.qty} &times; $${original.price}.00</p>
+                            </div>
+                            <button class="btn btn-danger" onclick="store.dispatch('REMOVE_ITEM', '${item.id}')" aria-label="Remove ${original.name} from cart">Remove</button>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <section aria-label="Shopping Cart Review">
+                        <h1 style="margin-bottom: 32px; font-size: 32px; letter-spacing: -0.02em;">Shopping Cart</h1>
+                        <ul class="cart-list">${rows}</ul>
+                        <div style="margin-top: 40px; text-align: right;">
+                            <h2 style="margin-bottom: 20px; font-size: 24px;">Subtotal Value: <span style="color:var(--primary);">$${total}.00</span></h2>
+                            <button class="btn" onclick="alert('Order submitted successfully!')">Proceed to Checkout</button>
+                        </div>
+                    </section>
+                `;
+            }
+        };
+
+        // --- 3. MASTER RENDER SYSTEM PIPELINE ---
+        const navShell = document.getElementById('nav-shell');
+        const viewport = document.getElementById('main-content');
+
+        function renderApp(state) {
+            navShell.innerHTML = NavbarComponent(state);
+            viewport.innerHTML = Pages[state.currentPage](state);
+            window.scrollTo(0, 0);
+        }
+
+        store.subscribe(renderApp);
+        renderApp(store.state);
+    </script>
+</body>
+</html>
+
