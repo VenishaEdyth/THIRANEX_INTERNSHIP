@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State-Driven To-Do App</title>
+    <style>
+        :root {
+            --bg: #f4f5f6;
+            --surface: #ffffff;
+            --text: #333333;
+            --primary: #4f46e5;
+            --danger: #ef4444;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .todo-card {
+            background: var(--surface);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .filter-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            gap: 8px;
+        }
+        .todo-item.completed span {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        .todo-text {
+            flex: 1;
+            cursor: pointer;
+        }
+        .edit-input {
+            flex: 1;
+            padding: 4px 8px;
+        }
+        .delete-btn {
+            background: var(--danger);
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="todo-card">
+        <h2>Task Manager</h2>
+        
+        <!-- Create -->
+        <form id="todo-form" class="input-group">
+            <input type="text" id="todo-input" placeholder="What needs to be done?" required autocomplete="off">
+            <button type="submit">Add</button>
+        </form>
+
+        <!-- Filter Links -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="active">Active</button>
+            <button class="filter-btn" data-filter="completed">Completed</button>
+        </div>
+
+        <!-- Read / Update / Delete -->
+        <ul id="todo-list" class="todo-list"></ul>
+    </div>
+
+    <script>
+        // --- STATE MANAGEMENT ---
+        let state = {
+            todos: JSON.parse(localStorage.getItem('todos')) || [],
+            filter: 'all'
+        };
+
+        function saveState() {
+            localStorage.setItem('todos', JSON.stringify(state.todos));
+            render();
+        }
+
+        // --- DOM ELEMENTS ---
+        const todoForm = document.getElementById('todo-form');
+        const todoInput = document.getElementById('todo-input');
+        const todoList = document.getElementById('todo-list');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+
+        // --- RENDER ENGINE ---
+        function render() {
+            todoList.innerHTML = '';
+
+            // Filter logic
+            const filteredTodos = state.todos.filter(todo => {
+                if (state.filter === 'active') return !todo.completed;
+                if (state.filter === 'completed') return todo.completed;
+                return true;
+            });
+
+            // Build DOM dynamically
+            filteredTodos.forEach(todo => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                li.dataset.id = todo.id;
+
+                if (todo.isEditing) {
+                    li.innerHTML = `
+                        <input type="text" class="edit-input" value="${todo.text}">
+                        <button class="save-btn">Save</button>
+                    `;
+                } else {
+                    li.innerHTML = `
+                        <input type="checkbox" class="toggle-chk" ${todo.completed ? 'checked' : ''}>
+                        <span class="todo-text">${todo.text}</span>
+                        <button class="delete-btn">Delete</button>
+                    `;
+                }
+                todoList.appendChild(li);
+            });
+        }
+
+        // --- EVENT HANDLERS & CRUD OPERATORS ---
+
+        // Create
+        todoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = todoInput.value.trim();
+            if (!text) return;
+
+            state.todos.push({
+                id: crypto.randomUUID(),
+                text: text,
+                completed: false,
+                isEditing: false
+            });
+
+            todoInput.value = '';
+            saveState();
+        });
+
+        // Event Delegation (Update & Delete)
+        todoList.addEventListener('click', (e) => {
+            const li = e.target.closest('.todo-item');
+            if (!li) return;
+            const id = li.dataset.id;
+            const todo = state.todos.find(t => t.id === id);
+
+            // Toggle Complete
+            if (e.target.classList.contains('toggle-chk')) {
+                todo.completed = e.target.checked;
+                saveState();
+            }
+
+            // Delete
+            if (e.target.classList.contains('delete-btn')) {
+                state.todos = state.todos.filter(t => t.id !== id);
+                saveState();
+            }
+
+            // Enter Edit Mode
+            if (e.target.classList.contains('todo-text')) {
+                todo.isEditing = true;
+                render();
+                // Focus the newly created input field immediately
+                li.querySelector('.edit-input').focus();
+            }
+
+            // Save Edit
+            if (e.target.classList.contains('save-btn')) {
+                const newText = li.querySelector('.edit-input').value.trim();
+                if (newText) {
+                    todo.text = newText;
+                    todo.isEditing = false;
+                    saveState();
+                }
+            }
+        });
+
+        // Handle enter key inside editing field
+        todoList.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.target.classList.contains('edit-input')) {
+                const li = e.target.closest('.todo-item');
+                const id = li.dataset.id;
+                const todo = state.todos.find(t => t.id === id);
+                const newText = e.target.value.trim();
+                
+                if (newText) {
+                    todo.text = newText;
+                    todo.isEditing = false;
+                    saveState();
+                }
+            }
+        });
+
+        // Filter Controller
+        document.querySelector('.filters').addEventListener('click', (e) => {
+            if (!e.target.classList.contains('filter-btn')) return;
+            
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            state.filter = e.target.dataset.filter;
+            render();
+        });
+
+        // Initial paint
+        render();
+    </script>
+</body>
+</html>
