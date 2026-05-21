@@ -1,0 +1,84 @@
+
+<!-- ===================== index.html (UPDATED WITH HAMBURGER) ===================== -->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Responsive portfolio using advanced CSS Grid and Flexbox">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="container">
+
+<button class="theme-toggle" aria-label="Toggle Dark Mode" onclick="toggleTheme()">🌙</button>
+
+<header>
+  <h1>My Portfolio</h1>
+
+  <!-- Hamburger Button -->
+  <button class="hamburger" aria-label="Toggle Menu" onclick="toggleMenu()">☰</button>
+
+  <nav aria-label="Main Navigation">
+    <ul id="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Projects</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Welcome</h2>
+    <p>Pixel-perfect responsive portfolio using modern CSS.</p>
+
+    <div class="card-container">
+      <div class="card">Project 1</div>
+      <div class="card">Project 2</div>
+      <div class="card">Project 3</div>
+    </div>
+  </section>
+
+  <aside>
+    <h3>Profile</h3>
+    <p>B.Tech Student | Web Developer</p>
+  </aside>
+</main>
+
+<footer>
+  <p>&copy; 2026 Portfolio</p>
+</footer>
+
+<script>
+function toggleTheme(){
+  const html=document.documentElement;
+  html.dataset.theme = html.dataset.theme === "light" ? "dark" : "light";
+}
+
+const navLinks = document.getElementById("nav-links");
+const hamburgerBtn = document.querySelector(".hamburger");
+
+function toggleMenu(){
+  navLinks.classList.toggle("active");
+}
+
+// ESC key to close menu
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && navLinks.classList.contains("active")) {
+    navLinks.classList.remove("active");
+    hamburgerBtn.focus();
+  }
+});
+
+// Close menu when clicking outside
+document.addEventListener("click", (e) => {
+  if (!navLinks.contains(e.target) && !hamburgerBtn.contains(e.target)) {
+    navLinks.classList.remove("active");
+  }
+});
+</script>
+
+</body>
+</html>
